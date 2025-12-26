@@ -189,8 +189,8 @@ def upgrade_pip():
 def get_installed_packages():
     """ Get currently installed packages """
     global INSTALLED_PACKAGES
-    chk = Popen("{} -m pip freeze".format(sys.executable),
-                shell=True, stdout=PIPE)
+    chk = Popen([sys.executable, "-m", "pip", "freeze"],
+                stdout=PIPE)
     installed = chk.communicate()[0].decode().splitlines()
     for pkg in installed:
         item = pkg.split("==")
@@ -211,7 +211,7 @@ def check_system_dependencies():
 
 def check_gcc():
     """ Check installed gcc version for linux """
-    chk = Popen("gcc --version", shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["gcc", "--version"], stdout=PIPE, stderr=PIPE)
     stdout, stderr = chk.communicate()
     if stderr:
         out_error("gcc not installed. Please install gcc for your distribution")
@@ -225,7 +225,7 @@ def check_gcc():
 
 def check_gpp():
     """ Check installed g++ version for linux """
-    chk = Popen("g++ --version", shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["g++", "--version"], stdout=PIPE, stderr=PIPE)
     stdout, stderr = chk.communicate()
     if stderr:
         out_error("g++ not installed. Please install g++ for your distribution")
@@ -239,7 +239,7 @@ def check_gpp():
 
 def check_cmake():
     """ Check CMake is installed for Windows """
-    chk = Popen("cmake --version", shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["cmake", "--version"], stdout=PIPE, stderr=PIPE)
     stdout, stderr = chk.communicate()
     stdout = stdout.decode()
     if stderr and OS_VERSION[0] == "Windows":
@@ -258,8 +258,8 @@ def check_cmake():
 
 def check_cmake_windows():
     """ Additional checks for cmake on Windows """
-    chk = Popen("wmic product where \"name = 'cmake'\" get installlocation,version",
-                shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["wmic", "product", "where", "name = 'cmake'", "get", "installlocation,version"],
+                stdout=PIPE, stderr=PIPE)
     stdout, stderr = chk.communicate()
     if stderr:
         return False, stderr
@@ -280,8 +280,8 @@ def check_visual_studio():
         Somewhat hacky solution which checks for the existence
         of the VS2015 Performance Report
     """
-    chk = Popen("reg query HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VSPerf",
-                shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["reg", "query", "HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VSPerf"],
+                stdout=PIPE, stderr=PIPE)
     _, stderr = chk.communicate()
     if stderr:
         out_error("Visual Studio 2015 could not be found. See "
@@ -293,9 +293,9 @@ def check_visual_studio():
 
 def check_cplus_plus():
     """ Check Visual C++ Redistributable 2015 is instlled for Windows """
-    chk = Popen("reg query HKLM\\SOFTWARE\\Classes\\Installer\\Dependencies"
-                "\\{d992c12e-cab2-426f-bde3-fb8c53950b0d}",
-                shell=True, stdout=PIPE, stderr=PIPE)
+    chk = Popen(["reg", "query", "HKLM\\SOFTWARE\\Classes\\Installer\\Dependencies"
+                "\\{d992c12e-cab2-426f-bde3-fb8c53950b0d}"],
+                stdout=PIPE, stderr=PIPE)
     stdout, stderr = chk.communicate()
     if stderr:
         out_error("Visual C++ 2015 could not be found. Make sure you have selected 'Visual C++' "
